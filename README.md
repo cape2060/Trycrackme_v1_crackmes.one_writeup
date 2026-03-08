@@ -1,7 +1,8 @@
+##### Executable file link: https://crackmes.one/crackme/6727d5fa9b533b4c22bd23e5
 # trycrackme — Crackme Writeup
 
 > **Platform:** crackmes.one  
-> **Difficulty:** 3.3 / 5  
+> **Difficulty:** 3.3 / 6  
 > **Architecture:** x86 Windows EXE  
 > **Packer:** UPX  
 > **Serial Type:** Runtime generated (not hardcoded)  
@@ -205,83 +206,6 @@ Input: Name string
 
 ---
 
-## 5. Python Keygen
-
-The full algorithm was replicated in Python:
-
-```python
-#!/usr/bin/python3
-
-import string
-
-def rcl(value, shift, carry, bits=32):
-    """Rotate through Carry Left"""
-    mask = (1 << bits) - 1
-    for _ in range(shift):
-        new_carry = (value >> (bits - 1)) & 1
-        value = ((value << 1) | carry) & mask
-        carry = new_carry
-    return value, carry
-
-def shl(value, shift, bits=32):
-    """Shift Left"""
-    mask = (1 << bits) - 1
-    new_cf = (value >> (bits - shift)) & 1 if shift > 0 else 0
-    result = (value << shift) & mask
-    return result, new_cf
-
-def rotating(length):
-    """Generate seed from name length using LCG + 128-bit shift register"""
-    multiplier = 0x19660d
-    adder      = 0x3c6ef35f
-    divider    = 0x5e
-    t_rot      = 0x40
-    seed       = ""
-    eax        = (length * multiplier) + adder
-
-    for _ in range(length):
-        carry = esi = rdi = edx = 0
-        ebp = 1
-        for _ in range(t_rot):
-            eax, carry = shl(eax, 1)
-            edx, carry = rcl(edx, 1, carry)
-            esi, carry = rcl(esi, 1, carry)
-            rdi, carry = rcl(rdi, 1, carry)
-            carry = 1 if rdi < ebp else 0
-        eax = (((esi * multiplier) & 0xFFFFFFFF) + adder) & 0xFFFFFFFF
-        seed += chr((esi % divider) + 0x21)
-    return seed
-
-def convert_to_ascii(s):
-    """Convert each seed character to its uppercase hex ASCII code"""
-    return [hex(ord(c)).replace('0x', '') for c in s]
-
-def addnumber(string1):
-    """Apply ROT-12 to uppercase letters only"""
-    letters = string.ascii_letters
-    return [
-        s.replace(s, chr(((ord(s) - 64 + 12) % 26) + 64))
-        if s in letters and (((ord(s) - 64 + 12) % 26) + 64) != 64
-        else 'Z' if (((ord(s) - 64 + 12) % 26) + 64) == 64 and s in letters
-        else s
-        for s in string1
-    ]
-
-def addhiphun(s):
-    """Insert '-' after every 4 characters"""
-    st = [f'{c}-' if (i + 1) % 4 == 0 else c for i, c in enumerate(s)]
-    result = "".join(st)
-    return result[:-1] if result.endswith('-') else result
-
-if __name__ == "__main__":
-    name = input('\033[32m[-] Enter Your Name: \033[0m')
-    seed = rotating(len(name))
-    ball = list("".join(convert_to_ascii(seed)).upper())
-    n    = addnumber(ball)
-    cat  = addhiphun("".join(n))
-    print("\033[33m[+] Your Serial Key:", cat)
-```
-
 **Usage:**
 
 ```bash
@@ -293,7 +217,7 @@ $ python3 key_gen.py
 
 ---
 
-## 6. Key Takeaways
+## 5. Key Takeaways
 
 - **UPX detection is easy** — `strings` leaks the packer signature immediately; always run `strings` on an unknown binary first.
 - **The ESP Trick is reliable for UPX** — `PUSHAD → unpack → POPAD → JMP OEP` is UPX's standard pattern; a hardware BP on ESP−4 catches it every time.

@@ -26,7 +26,7 @@ def shl(value, shift, bits=32):
     
     return result, new_cf
 def rotating(length):
-    """This function is use to generate the see using the length of the name
+    """This function is use to generate the seed using the length of the name
     """
     multiplier = 0x19660d
     adder = 0x3c6ef35f
