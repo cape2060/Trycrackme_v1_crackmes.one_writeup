@@ -217,7 +217,7 @@ $ python3 key_gen.py
 
 ---
 
-## 6. Key Takeaways
+## 5. Key Takeaways
 
 - **UPX detection is easy** — `strings` leaks the packer signature immediately; always run `strings` on an unknown binary first.
 - **The ESP Trick is reliable for UPX** — `PUSHAD → unpack → POPAD → JMP OEP` is UPX's standard pattern; a hardware BP on ESP−4 catches it every time.
