@@ -75,7 +75,7 @@ example: if string is 12345678 then this function return 1234-5678
 if __name__ == "__main__":
     Name = input('\033[32m[-] Enter Your Name: \033[0m')
     seed = rotating(len(Name))
-#    print(seed)
+    print('\033[38;5;198m[+] Your seed is:\033[38;5;204m',seed,"\033[0m")
     ball = list("".join(convert_to_ascii(seed)).upper())
     n = addnumber(ball)
     cat = addhiphun("".join(n))
